@@ -1,32 +1,33 @@
-import "../css/pagination.scss";
+import React from "react";
+
+import PropTypes from "prop-types";
+import { nanoid } from "nanoid";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/outline";
 import usePagination, { DOTS } from "../hooks/usePagination";
-
-import PropTypes from "prop-types";
-import React from "react";
-import { nanoid } from "nanoid";
-
+import "../css/pagination.scss";
 function Pagination({
   onPageChange,
   onPageSizeOptionChange,
   totalCount,
   currentPage,
   pageSize,
+  siblingCount = 1,
   pageSizeOptions,
 }) {
   const paginationRange = usePagination({
     currentPage,
     totalCount,
+    siblingCount,
     pageSize,
   });
 
   const onNext = () => {
-    onPageChange(currentPage + 1);
+    onPageChange((prev) => prev + 1);
   };
 
   const onPrevious = () => {
-    onPageChange(currentPage - 1);
+    onPageChange((prev) => prev - 1);
   };
 
   return (
@@ -42,13 +43,14 @@ function Pagination({
           // Do not modify the aria-label below, it is used for Hatchways automation.
           aria-label="Goto previous page"
           onClick={onPrevious}
-          disabled={false} // change this line to disable a button.
+          disabled={currentPage === 0}
         >
           <ChevronLeftIcon />
         </button>
       </li>
 
       {paginationRange.map((pageNumber) => {
+        const selectedItem = pageNumber === currentPage + 1;
         const key = nanoid();
 
         if (pageNumber === DOTS) {
@@ -60,16 +62,16 @@ function Pagination({
         }
 
         return (
-          <li
-            key={key}
-            className="paginationItem"
-            aria-current="false" // change this line to highlight a current page.
-          >
+          <li key={key} className="paginationItem" aria-current="false">
             <button
               type="button"
+              style={{
+                background: selectedItem ? "black" : "white",
+                color: selectedItem ? "white" : "black",
+              }}
               // Do not modify the aria-label below, it is used for Hatchways automation.
               aria-label={`Goto page ${pageNumber}`}
-              onClick={() => onPageChange(pageNumber)}
+              onClick={() => onPageChange(pageNumber - 1)}
             >
               {pageNumber}
             </button>
@@ -84,7 +86,7 @@ function Pagination({
           // Do not modify the aria-label below, it is used for Hatchways automation.
           aria-label="Goto next page"
           onClick={onNext}
-          disabled={false} // change this line to disable a button.
+          disabled={currentPage >= Math.ceil(totalCount / pageSize) - 1}
         >
           <ChevronRightIcon />
         </button>
@@ -96,7 +98,8 @@ function Pagination({
         aria-label="Select page size"
         value={pageSize}
         onChange={(e) => {
-          onPageSizeOptionChange(e.target.value);
+          onPageSizeOptionChange(parseInt(e.target.value));
+          onPageChange(0);
         }}
       >
         {pageSizeOptions.map((size) => (
