@@ -1,11 +1,12 @@
-import React from "react";
-
-import PropTypes from "prop-types";
-import { nanoid } from "nanoid";
+import "../css/pagination.scss";
 
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/outline";
 import usePagination, { DOTS } from "../hooks/usePagination";
-import "../css/pagination.scss";
+
+import PropTypes from "prop-types";
+import React from "react";
+import { nanoid } from "nanoid";
+
 function Pagination({
   onPageChange,
   onPageSizeOptionChange,
@@ -49,7 +50,7 @@ function Pagination({
         </button>
       </li>
 
-      {paginationRange.map((pageNumber) => {
+      {paginationRange.map((pageNumber) =>  {
         const selectedItem = pageNumber === currentPage + 1;
         const key = nanoid();
 
